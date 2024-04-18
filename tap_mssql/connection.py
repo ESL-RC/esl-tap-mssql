@@ -61,4 +61,13 @@ def ResultIterator(cursor, arraysize=1):
         if not results:
             break
         for result in results:
+            result = tuple(replace_special_decimal(element) for element in result)
             yield result
+
+def replace_special_decimal(element):
+    if isinstance(element, str):
+        return element.replace("\x00", "")
+    elif isinstance(element, float):
+        return float("{:.17f}".format(element))
+    else:
+        return element

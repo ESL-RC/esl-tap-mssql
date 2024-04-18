@@ -4,6 +4,7 @@
 import pendulum
 import singer
 from singer import metadata
+from datetime import datetime
 
 import tap_mssql.sync_strategies.common as common
 from tap_mssql.connection import MSSQLConnection, connect_with_backoff
@@ -59,7 +60,7 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
                     replication_key_metadata, replication_key_metadata
                 )
 
-                params["replication_key_value"] = replication_key_value
+                params["replication_key_value"] = datetime.fromtimestamp(replication_key_value.timestamp())
             elif replication_key_metadata is not None:
                 select_sql += ' ORDER BY "{}" ASC'.format(replication_key_metadata)
 
