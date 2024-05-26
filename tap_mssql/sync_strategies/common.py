@@ -139,7 +139,7 @@ def generate_select_sql(catalog_entry, columns):
     escaped_table = escape(catalog_entry.table)
     escaped_columns = map(lambda c: prepare_columns_sql(catalog_entry, c), columns)
 
-    select_sql = "SELECT {} FROM {}.{}".format(",".join(escaped_columns), escaped_db, escaped_table)
+    select_sql = "SELECT {} FROM {}.{} with (nolock)".format(",".join(escaped_columns), escaped_db, escaped_table)
 
     return select_sql
 
