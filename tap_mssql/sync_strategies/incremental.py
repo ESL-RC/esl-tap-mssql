@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 # pylint: disable=duplicate-code
 
+'''
+    Highly Customized by Roger
+    - To sync the replication_key_value - 10 days before due to Poor DB design
+
+'''
+
 import pendulum
 import singer
 from singer import metadata
@@ -53,7 +59,7 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
 
             if replication_key_value is not None:
                 if catalog_entry.schema.properties[replication_key_metadata].format == "date-time":
-                    replication_key_value = pendulum.parse(replication_key_value).format('YYYY-MM-DDTHH:MM:ss.SSS') 
+                    replication_key_value = pendulum.parse(replication_key_value).subtract(days=10).format('YYYY-MM-DDTHH:MM:ss.SSS') 
 
                 select_sql += ' WHERE "{}" >= %(replication_key_value)s ORDER BY "{}" ASC'.format(
                     replication_key_metadata, replication_key_metadata
