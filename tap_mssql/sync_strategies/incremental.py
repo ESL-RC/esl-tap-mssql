@@ -26,6 +26,9 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
     catalog_metadata = metadata.to_map(catalog_entry.metadata)
     stream_metadata = catalog_metadata.get((), {})
 
+    # Adding 1 more key to sync
+    replication_key_2 = stream_metadata.get("replication-key-2")
+
     replication_key_metadata = stream_metadata.get("replication-key")
     replication_key_state = singer.get_bookmark(
         state, catalog_entry.tap_stream_id, "replication_key"
@@ -61,8 +64,17 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
                 if catalog_entry.schema.properties[replication_key_metadata].format == "date-time":
                     replication_key_value = pendulum.parse(replication_key_value).subtract(days=10).format('YYYY-MM-DDTHH:MM:ss.SSS') 
 
-                select_sql += ' WHERE "{}" >= %(replication_key_value)s ORDER BY "{}" ASC'.format(
-                    replication_key_metadata, replication_key_metadata
+                select_sql += ' WHERE "{}" >= %(replication_key_value)s'.format(
+                    replication_key_metadata
+                )
+
+                if replication_key_2:
+                    select_sql += ' OR "{}" >= %(replication_key_value)s'.format(
+                        replication_key_2
+                    )
+
+                select_sql += ' ORDER BY "{}" ASC'.format(
+                    replication_key_metadata
                 )
 
                 params["replication_key_value"] = replication_key_value
