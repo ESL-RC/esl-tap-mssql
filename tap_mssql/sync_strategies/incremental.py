@@ -29,6 +29,10 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
     # Adding 1 more key to sync
     replication_key_2 = stream_metadata.get("replication-key-2")
 
+    # Adding another key to sync
+    replication_key_3 = stream_metadata.get("replication-key-3")
+
+
     replication_key_metadata = stream_metadata.get("replication-key")
     replication_key_state = singer.get_bookmark(
         state, catalog_entry.tap_stream_id, "replication_key"
@@ -71,6 +75,11 @@ def sync_table(mssql_conn, config, catalog_entry, state, columns):
                 if replication_key_2:
                     select_sql += ' OR "{}" >= %(replication_key_value)s'.format(
                         replication_key_2
+                    )
+
+                if replication_key_3:
+                    select_sql += ' OR "{}" >= %(replication_key_value)s'.format(
+                        replication_key_3
                     )
 
                 select_sql += ' ORDER BY "{}" ASC'.format(
